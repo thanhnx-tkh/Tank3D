@@ -6,6 +6,13 @@ using UnityEngine.AI;
 public class Enemy : MonoBehaviour
 {
     [SerializeField] private NavMeshAgent agent;
+    [SerializeField] private GameObject player;
+    [SerializeField] private TankShootingEnemy shooting;
+    [SerializeField] private float attackSpeed;
+    public float AttackSpeed => attackSpeed;
+    public Rigidbody rb;
+    public TankShootingEnemy Shooting => shooting;
+    public GameObject Player => player;
     public NavMeshAgent Agent => agent;
     private IState<Enemy> currentState;
 
@@ -57,5 +64,18 @@ public class Enemy : MonoBehaviour
 
         return randomPosition;
     }
+    public void FollowPlayer()
+    {
+        if (player != null)
+        {
+            Agent.SetDestination(player.transform.position);
+        }
+    }
 
+    public void RotationPlayer()
+    {
+        Vector3 direction = (player.transform.position - transform.position).normalized;
+        Quaternion lookRotation = Quaternion.LookRotation(direction);
+        transform.rotation = lookRotation;
+    }
 }

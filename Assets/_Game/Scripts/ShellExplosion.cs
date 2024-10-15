@@ -19,6 +19,7 @@ public class ShellExplosion : MonoBehaviour
 
     private void OnTriggerEnter (Collider other)
     {
+        Debug.Log(other.gameObject.name);
         Collider[] colliders = Physics.OverlapSphere (transform.position, explosionRadius, tankMask);
 
         for (int i = 0; i < colliders.Length; i++)
@@ -27,8 +28,8 @@ public class ShellExplosion : MonoBehaviour
 
             if (!targetRigidbody)
                 continue;
-
-            targetRigidbody.AddExplosionForce (explosionForce, transform.position, explosionRadius);
+            // thêm lực 
+            //targetRigidbody.AddExplosionForce (explosionForce, transform.position, explosionRadius);
 
             TankHealth targetHealth = targetRigidbody.GetComponent<TankHealth> ();
 

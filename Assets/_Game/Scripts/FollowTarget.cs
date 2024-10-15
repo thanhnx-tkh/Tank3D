@@ -2,18 +2,18 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AttackRange : MonoBehaviour
+public class FollowTarget : MonoBehaviour
 {
     public Enemy enemyParent;
     private void OnTriggerEnter(Collider other)
     {
         if(other.CompareTag("Player")){
-            enemyParent.ChangeState(new AttackState());
+            enemyParent.ChangeState(new FollowState());
         }
     }
     private void OnTriggerExit(Collider other) {
         if(other.CompareTag("Player")){
-            enemyParent.ChangeState(new FollowState());
+            enemyParent.ChangeState(new IdleState());
         }
     }
 }
