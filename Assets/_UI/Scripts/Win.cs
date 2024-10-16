@@ -7,7 +7,7 @@ using UnityEngine.UI;
 public class Win : UICanvas
 {
     public Button retryButton;
-    private void Start() {
+    private void OnEnable() {
         retryButton.onClick.AddListener(RetryButton);
     }
     private void RetryButton(){

@@ -1,47 +1,65 @@
+using System.Collections;
 using UnityEngine;
 
 public class ShellExplosion : MonoBehaviour
 {
-    public LayerMask tankMask;       
-    public ParticleSystem explosionParticles;         
-    public AudioSource explosionAudio;                
-    public float maxDamage = 100f;                    
-    public float explosionForce = 1000f;              
-    public float maxLifeTime = 2f;                    
-    public float explosionRadius = 5f;                
+    public LayerMask tankMask;
+    public ParticleSystem explosionParticles;
+    public AudioSource explosionAudio;
+    public float maxDamage = 100f;
+    public float maxLifeTime = 2f;
+    public float explosionRadius = 5f;
 
 
-    private void Start ()
+    private void Start()
     {
-        Destroy (gameObject, maxLifeTime);
+        maxDamage = GameManager.Ins.configTank.maxDamage;
+        maxLifeTime = GameManager.Ins.configTank.maxLifeTime;
+        StartCoroutine(DestroyBullet());
+    }
+    private IEnumerator DestroyBullet()
+    {
+
+        yield return new WaitForSeconds(maxLifeTime);
+
+        explosionParticles.transform.parent = null;
+
+        explosionParticles.Play();
+
+        explosionAudio.Play();
+
+        Destroy(explosionParticles.gameObject, explosionParticles.main.duration);
+
+        Destroy(gameObject);
     }
 
 
-    private void OnTriggerEnter (Collider other)
+    private void OnTriggerEnter(Collider other)
     {
-        Debug.Log(other.gameObject.name);
+        //Debug.Log(other.gameObject.name);
 
-        if(other.CompareTag("MainHouse")){
+        if (other.CompareTag("MainHouse"))
+        {
 
             TankHealth targetHealth = other.GetComponent<TankHealth>();
 
-            targetHealth.TakeDamage (maxDamage);
+            targetHealth.TakeDamage(maxDamage);
             explosionParticles.transform.localScale = Vector3.one * 3f;
         }
 
-        Collider[] colliders = Physics.OverlapSphere (transform.position, explosionRadius, tankMask);
+        Collider[] colliders = Physics.OverlapSphere(transform.position, explosionRadius, tankMask);
 
         for (int i = 0; i < colliders.Length; i++)
         {
-            Rigidbody targetRigidbody = colliders[i].GetComponent<Rigidbody> ();
-            TankHealth targetHealth = targetRigidbody.GetComponent<TankHealth> ();
+            Rigidbody targetRigidbody = colliders[i].GetComponent<Rigidbody>();
+            TankHealth targetHealth = targetRigidbody.GetComponent<TankHealth>();
 
             if (!targetHealth)
                 continue;
 
-            float damage = CalculateDamage (targetRigidbody.position);
+            float damage = CalculateDamage(targetRigidbody.position);
 
-            targetHealth.TakeDamage (damage);
+            targetHealth.TakeDamage(damage);
         }
 
         explosionParticles.transform.parent = null;
@@ -50,13 +68,13 @@ public class ShellExplosion : MonoBehaviour
 
         explosionAudio.Play();
 
-        Destroy (explosionParticles.gameObject, explosionParticles.duration);
+        Destroy(explosionParticles.gameObject, explosionParticles.main.duration);
 
-        Destroy (gameObject);
+        Destroy(gameObject);
     }
 
 
-    private float CalculateDamage (Vector3 targetPosition)
+    private float CalculateDamage(Vector3 targetPosition)
     {
         Vector3 explosionToTarget = targetPosition - transform.position;
 
@@ -66,7 +84,7 @@ public class ShellExplosion : MonoBehaviour
 
         float damage = relativeDistance * maxDamage;
 
-        damage = Mathf.Max (0f, damage);
+        damage = Mathf.Max(0f, damage);
 
         return damage;
     }

@@ -11,7 +11,10 @@ public enum GameState{
 }
 public class GameManager : Singleton<GameManager>
 {
+    public Camera cameraMain;
     private static GameState gameState = GameState.MainMenu;
+
+    public ConfigTankSO configTank;
 
     // Start is called before the first frame update
     protected void Awake()

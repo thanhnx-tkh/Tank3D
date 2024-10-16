@@ -72,11 +72,4 @@ public class Enemy : MonoBehaviour
             Agent.SetDestination(player.transform.position);
         }
     }
-
-    public void RotationPlayer()
-    {
-        Vector3 direction = (player.transform.position - transform.position).normalized;
-        Quaternion lookRotation = Quaternion.LookRotation(direction);
-        transform.rotation = lookRotation;
-    }
 }

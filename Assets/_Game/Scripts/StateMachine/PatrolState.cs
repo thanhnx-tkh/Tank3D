@@ -22,7 +22,6 @@ public class PatrolState : IState<Enemy>
             destination = t.GetRandomPositionBot();
             t.Agent.SetDestination(destination);
         }
-
         if(timer > moveTime)
         {
             t.ChangeState(new IdleState());

@@ -1,43 +1,47 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class TankShootingEnemy : MonoBehaviour
 {
+    [SerializeField] private GameObject player;
+    [SerializeField] public float rotationSpeedTurret;
+    [SerializeField] private GameObject turret;
+    [SerializeField] private float attackSpeed;
+    [SerializeField] private float bulletSpeed;
+
     public Rigidbody shell_Prefab;
     public Transform fireTransform;
-    public Transform playerTransform;
-    public Slider aimSlider;
-    public float launchForce;
-    public float currentLaunchForce;
+    private bool canFire = true;
 
-
-
-    public void Fire()
+    private void Start()
     {
-        // Bước 1: Tính khoảng cách đến player
-        float distance = Vector3.Distance(fireTransform.position, playerTransform.position);
-
-        // Bước 2: Tính lực bắn dựa trên khoảng cách
-        float launchForce = CalculateLaunchForce(distance);
-
-        // Bước 3: Bắn đạn
-        Rigidbody shellInstance = Instantiate(shell_Prefab, fireTransform.position, fireTransform.rotation) as Rigidbody;
-        shellInstance.velocity = launchForce * fireTransform.forward;
+        attackSpeed = GameManager.Ins.configTank.attackSpeed;
+        bulletSpeed = GameManager.Ins.configTank.bulletSpeed;
     }
 
-    // Hàm tính toán lực bắn dựa trên khoảng cách và trọng lực
-    private float CalculateLaunchForce(float distance)
+    public void Turret()
     {
-        // Giả sử góc bắn (launch angle) là 45 độ để đạt được khoảng cách tối đa
-        float launchAngle = 80f * Mathf.Deg2Rad; // Chuyển đổi từ độ sang radian
+        Vector3 turretDirection = (player.transform.position - transform.position).normalized;
 
-        // Tính vận tốc ban đầu cần thiết dựa trên công thức:
-        // v = sqrt(d * g / sin(2 * theta))
-        float launchForce = Mathf.Sqrt(distance * Mathf.Abs(-9.81f) / Mathf.Sin(2 * launchAngle));
+        Quaternion desiredRotation = Quaternion.LookRotation(turretDirection, Vector3.up);
 
-        // Giới hạn lực bắn trong khoảng từ minLaunchForce đến maxLaunchForce
-        return Mathf.Clamp(launchForce, 10, 30);
+        turret.transform.rotation = Quaternion.RotateTowards(turret.transform.rotation, desiredRotation, rotationSpeedTurret * Time.deltaTime);
+
+        if (Quaternion.Angle(turret.transform.rotation, desiredRotation) < 1f)
+        {
+            if (canFire)
+            {
+                StartCoroutine(Fire());
+            }
+        }
+
+    }
+    private IEnumerator Fire()
+    {
+        canFire = false;
+        Rigidbody shellInstance = Instantiate(shell_Prefab, fireTransform.position, fireTransform.rotation) as Rigidbody;
+        shellInstance.velocity = bulletSpeed * fireTransform.forward;
+        yield return new WaitForSeconds(attackSpeed);
+        canFire = true;
     }
 }

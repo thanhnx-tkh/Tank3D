@@ -1,72 +1,59 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.EventSystems; // Để sử dụng EventTrigger
+using UnityEngine.EventSystems;
+using System.Collections;
 
 public class TankShooting : MonoBehaviour
 {
-    [SerializeField] private Button fireButton;
+    [SerializeField] private VariableJoystick joystickShoot;
+    [SerializeField] public float rotationSpeedTurret;
+    [SerializeField] private GameObject turret;
+    [SerializeField] private float attackSpeed;
+    [SerializeField] private float bulletSpeed;
     public Rigidbody shell_Prefab;
     public Transform fireTransform;
-    public Slider aimSlider;
-    public float minLaunchForce = 15f;
-    public float maxLaunchForce = 30f;
-    public float maxChargeTime = 0.75f;
-    private float currentLaunchForce;
-    private float chargeSpeed;
-    private bool isFired;
+    private bool canFire = true;
 
-    private void OnEnable()
-    {
-        isFired = true;
-        currentLaunchForce = minLaunchForce;
-        aimSlider.value = minLaunchForce;
+    private void Start() {
+        attackSpeed = GameManager.Ins.configTank.attackSpeed;
+        bulletSpeed = GameManager.Ins.configTank.bulletSpeed;   
     }
 
-    private void Start()
-    {
-        chargeSpeed = (maxLaunchForce - minLaunchForce) / maxChargeTime;
-
-        // Gán sự kiện sử dụng EventTrigger
-        EventTrigger trigger = fireButton.gameObject.AddComponent<EventTrigger>();
-
-        EventTrigger.Entry pointerDownEntry = new EventTrigger.Entry();
-        pointerDownEntry.eventID = EventTriggerType.PointerDown;
-        pointerDownEntry.callback.AddListener((data) => { StartCharging(); });
-        trigger.triggers.Add(pointerDownEntry);
-
-        EventTrigger.Entry pointerUpEntry = new EventTrigger.Entry();
-        pointerUpEntry.eventID = EventTriggerType.PointerUp;
-        pointerUpEntry.callback.AddListener((data) => { Fire(); });
-        trigger.triggers.Add(pointerUpEntry);
-    }
-
-    public void StartCharging()
-    {
-        isFired = false;
-        currentLaunchForce = minLaunchForce;
-    }
 
     private void Update()
     {
-        aimSlider.value = minLaunchForce;
+        Turret();
+    }
 
-        if (!isFired)
+    private void Turret()
+    {
+        float horizontalInput = joystickShoot.Horizontal;
+        float verticalInput = joystickShoot.Vertical;
+
+        if (Mathf.Abs(horizontalInput) > 0 || Mathf.Abs(verticalInput) > 0)
         {
-            currentLaunchForce += chargeSpeed * Time.deltaTime;
-            currentLaunchForce = Mathf.Clamp(currentLaunchForce, minLaunchForce, maxLaunchForce);
-            aimSlider.value = currentLaunchForce;
+            Vector3 turretDirection = new Vector3(horizontalInput, 0, verticalInput);
+
+            Quaternion desiredRotation = Quaternion.LookRotation(turretDirection, Vector3.up);
+
+            turret.transform.rotation = Quaternion.RotateTowards(turret.transform.rotation, desiredRotation, rotationSpeedTurret * Time.deltaTime);
+
+            if (Quaternion.Angle(turret.transform.rotation, desiredRotation) < 1f)
+            {
+                if (canFire)
+                {
+                    StartCoroutine(Fire());
+                }
+            }
         }
     }
 
-    private void Fire()
+    private IEnumerator Fire()
     {
-        if (isFired) return;
-
-        isFired = true;
-
+        canFire = false;
         Rigidbody shellInstance = Instantiate(shell_Prefab, fireTransform.position, fireTransform.rotation) as Rigidbody;
-        shellInstance.velocity = currentLaunchForce * fireTransform.forward;
-
-        currentLaunchForce = minLaunchForce;
+        shellInstance.velocity = bulletSpeed * fireTransform.forward;
+        yield return new WaitForSeconds(attackSpeed);
+        canFire = true;
     }
 }
