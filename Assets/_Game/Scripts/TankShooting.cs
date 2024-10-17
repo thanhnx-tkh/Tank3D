@@ -14,6 +14,8 @@ public class TankShooting : MonoBehaviour
     public Transform fireTransform;
     private bool canFire = true;
 
+    public AudioSource ShootTankAudio;
+
     private void Start() {
         attackSpeed = GameManager.Ins.configTank.attackSpeed;
         bulletSpeed = GameManager.Ins.configTank.bulletSpeed;   
@@ -52,6 +54,7 @@ public class TankShooting : MonoBehaviour
     {
         canFire = false;
         Rigidbody shellInstance = Instantiate(shell_Prefab, fireTransform.position, fireTransform.rotation) as Rigidbody;
+        ShootTankAudio.Play();
         shellInstance.velocity = bulletSpeed * fireTransform.forward;
         yield return new WaitForSeconds(attackSpeed);
         canFire = true;

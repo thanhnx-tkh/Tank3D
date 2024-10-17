@@ -5,11 +5,15 @@ public class TankMovement : MonoBehaviour
     [SerializeField] private VariableJoystick joystick;
     [SerializeField] private Rigidbody rb;
     [SerializeField] public float rotationSpeed = 1000f;
+    public AudioSource MoveTankAudio;
     public float speed = 12f;
     private Vector3 direction;
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
+    }
+    private void Start() {
+        MoveTankAudio.enabled = false;
     }
     private void OnEnable()
     {
@@ -31,6 +35,7 @@ public class TankMovement : MonoBehaviour
     {
         if (direction.magnitude >= 0.1f)
         {
+            MoveTankAudio.enabled = true;
             Vector3 moveDirection = new Vector3(direction.x, 0f, direction.y);
             Quaternion targetRotation = Quaternion.LookRotation(moveDirection, Vector3.up);
 
@@ -50,6 +55,7 @@ public class TankMovement : MonoBehaviour
         }
         else
         {
+            MoveTankAudio.enabled = false;
             rb.velocity = Vector3.zero;
         }
     }

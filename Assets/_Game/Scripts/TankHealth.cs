@@ -10,6 +10,8 @@ public class TankHealth : MonoBehaviour
     private ParticleSystem explosionParticles;        // The particle system the will play when the tank is destroyed.
     private float currentHealth;                      // How much health the tank currently has.
     private bool isDead;                                // Has the tank been reduced beyond zero health yet?
+
+    public AudioSource explosionTankAudio;
     
     public float scaleExplosion = 3f;
 
@@ -60,6 +62,7 @@ public class TankHealth : MonoBehaviour
         explosionParticles.gameObject.SetActive(true);
 
         explosionParticles.Play();
+        explosionTankAudio.Play();
 
         gameObject.SetActive (false);
     }

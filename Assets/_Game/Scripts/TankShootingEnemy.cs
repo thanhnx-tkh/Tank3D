@@ -8,6 +8,8 @@ public class TankShootingEnemy : MonoBehaviour
     [SerializeField] private GameObject turret;
     [SerializeField] private float attackSpeed;
     [SerializeField] private float bulletSpeed;
+    public AudioSource ShootTankAudio;
+
 
     public Rigidbody shell_Prefab;
     public Transform fireTransform;
@@ -40,6 +42,7 @@ public class TankShootingEnemy : MonoBehaviour
     {
         canFire = false;
         Rigidbody shellInstance = Instantiate(shell_Prefab, fireTransform.position, fireTransform.rotation) as Rigidbody;
+        ShootTankAudio.Play();
         shellInstance.velocity = bulletSpeed * fireTransform.forward;
         yield return new WaitForSeconds(attackSpeed);
         canFire = true;
