@@ -3,6 +3,7 @@ using UnityEngine;
 
 public class ShellExplosion : MonoBehaviour
 {
+    public int id;
     public LayerMask tankMask;
     public ParticleSystem explosionParticles;
     public AudioSource explosionAudio;
@@ -36,15 +37,20 @@ public class ShellExplosion : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        //Debug.Log(other.gameObject.name);
 
-        if (other.CompareTag("MainHouse"))
+        if (other.CompareTag("MainHouse") && id == 1)
         {
 
             TankHealth targetHealth = other.GetComponent<TankHealth>();
 
             targetHealth.TakeDamage(maxDamage);
             explosionParticles.transform.localScale = Vector3.one * 3f;
+        }
+
+        if (other.CompareTag("Wooden"))
+        {
+            TankHealth targetHealth = other.GetComponent<TankHealth>();
+            targetHealth.TakeDamage(maxDamage); 
         }
 
         Collider[] colliders = Physics.OverlapSphere(transform.position, explosionRadius, tankMask);

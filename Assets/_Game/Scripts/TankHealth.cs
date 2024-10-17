@@ -10,7 +10,8 @@ public class TankHealth : MonoBehaviour
     private ParticleSystem explosionParticles;        // The particle system the will play when the tank is destroyed.
     private float currentHealth;                      // How much health the tank currently has.
     private bool isDead;                                // Has the tank been reduced beyond zero health yet?
-
+    
+    public float scaleExplosion = 3f;
 
     private void Awake ()
     {
@@ -36,7 +37,7 @@ public class TankHealth : MonoBehaviour
     }
     private void SetHealthUI ()
     {
-        slider.value = currentHealth;
+        if(slider != null) slider.value = currentHealth;
         if(slider2D != null) slider2D.value = currentHealth;
     }
     private void OnDeath ()
@@ -54,7 +55,7 @@ public class TankHealth : MonoBehaviour
             UIManager.Ins.OpenUI<Win>();
         }
         isDead = true;
-        explosionParticles.transform.localScale = Vector3.one * 3f;
+        explosionParticles.transform.localScale = Vector3.one * scaleExplosion;
         explosionParticles.transform.position = transform.position;
         explosionParticles.gameObject.SetActive(true);
 
